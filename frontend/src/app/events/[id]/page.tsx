@@ -134,6 +134,8 @@ export default function EventDetailPage() {
     try {
       await apiClient.delete(`/events/${eventId}`);
       queryClient.invalidateQueries({ queryKey: ['events'] });
+      queryClient.invalidateQueries({ queryKey: ['featured-events'] });
+      queryClient.invalidateQueries({ queryKey: ['my-created-events'] });
       router.push('/events');
     } catch (err: any) {
       const msg = err.response?.data?.error?.message || 'Failed to delete event.';

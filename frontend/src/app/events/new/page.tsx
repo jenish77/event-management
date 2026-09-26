@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -42,6 +43,7 @@ type CreateEventFormValues = z.infer<typeof createEventSchema>;
 
 export default function CreateEventPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const [serverError, setServerError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -68,6 +70,9 @@ export default function CreateEventPage() {
         eventDate: new Date(values.eventDate).toISOString(),
       };
       const { data } = await apiClient.post('/events', payload);
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      queryClient.invalidateQueries({ queryKey: ['featured-events'] });
+      queryClient.invalidateQueries({ queryKey: ['my-created-events'] });
       router.push(`/events/${data.id}`);
     } catch (err: any) {
       const errorMsg =

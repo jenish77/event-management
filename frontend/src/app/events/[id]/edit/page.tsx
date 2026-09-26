@@ -106,6 +106,8 @@ export default function EditEventPage() {
       await apiClient.patch(`/events/${eventId}`, payload);
       queryClient.invalidateQueries({ queryKey: ['event', eventId] });
       queryClient.invalidateQueries({ queryKey: ['events'] });
+      queryClient.invalidateQueries({ queryKey: ['featured-events'] });
+      queryClient.invalidateQueries({ queryKey: ['my-created-events'] });
       router.push(`/events/${eventId}`);
     } catch (err: any) {
       const errorMsg =
