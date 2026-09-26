@@ -97,10 +97,8 @@ docker compose up -d
    ```
 
 4. **Run Prisma Migrations**:
-   Push the schema to your PostgreSQL database:
-   ```bash
-   npx prisma db push
-   ```
+   - **Production Deployment**: `npx prisma migrate deploy`
+   - **Local Prototyping**: `npx prisma db push`
 
 5. **Start the Backend API Server**:
    ```bash
