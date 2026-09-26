@@ -13,7 +13,7 @@ export class AttendeesService {
     return await this.prisma.$transaction(async (tx) => {
       // Lock the Event row FOR UPDATE to prevent race conditions during high-concurrency requests
       const lockedEvents: any[] = await tx.$queryRaw`
-        SELECT id FROM "Event" WHERE id = ${eventId} FOR UPDATE
+        SELECT id FROM "events" WHERE id = ${eventId} FOR UPDATE
       `;
 
       if (!lockedEvents || lockedEvents.length === 0) {
