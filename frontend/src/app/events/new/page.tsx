@@ -16,7 +16,17 @@ const createEventSchema = z.object({
     .min(1, 'Event title is required')
     .max(150, 'Title cannot exceed 150 characters'),
   description: z.string().max(2000, 'Description cannot exceed 2000 characters').optional(),
-  eventDate: z.string().min(1, 'Event date and time is required'),
+  eventDate: z
+    .string()
+    .min(1, 'Event date and time is required')
+    .refine(
+      (val) => {
+        if (!val) return false;
+        const selected = new Date(val).getTime();
+        return selected >= Date.now() - 60000; // allow current minute
+      },
+      { message: 'Event date and time cannot be in the past' },
+    ),
   location: z
     .string()
     .min(1, 'Event location is required')
@@ -35,6 +45,11 @@ export default function CreateEventPage() {
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const [serverError, setServerError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const now = new Date();
+  const minDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, 16);
 
   const {
     register,
@@ -132,6 +147,7 @@ export default function CreateEventPage() {
               <label className="block text-xs font-semibold text-slate-700 mb-1">Date & Time *</label>
               <input
                 type="datetime-local"
+                min={minDateTime}
                 {...register('eventDate')}
                 className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
               />

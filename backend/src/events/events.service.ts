@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -15,6 +16,10 @@ export class EventsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(userId: string, dto: CreateEventDto): Promise<EventResponseDto> {
+    const targetDate = new Date(dto.eventDate).getTime();
+    if (targetDate < Date.now() - 60000) {
+      throw new BadRequestException('Event date and time cannot be in the past.');
+    }
     const event = await this.prisma.event.create({
       data: {
         title: dto.title.trim(),
@@ -165,6 +170,13 @@ export class EventsService {
 
     if (event.createdBy !== userId) {
       throw new ForbiddenException('You do not have permission to update this event.');
+    }
+
+    if (dto.eventDate) {
+      const targetDate = new Date(dto.eventDate).getTime();
+      if (targetDate < Date.now() - 60000) {
+        throw new BadRequestException('Event date and time cannot be in the past.');
+      }
     }
 
     const updatedEvent = await this.prisma.event.update({
