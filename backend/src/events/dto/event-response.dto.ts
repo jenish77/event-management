@@ -2,53 +2,53 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreatorSummaryDto {
   @ApiProperty()
-  id: string;
+  id!: string;
 
   @ApiProperty()
-  name: string;
+  name!: string;
 
   @ApiProperty()
-  email: string;
+  email!: string;
 }
 
 export class EventResponseDto {
   @ApiProperty()
-  id: string;
+  id!: string;
 
   @ApiProperty()
-  title: string;
+  title!: string;
 
   @ApiPropertyOptional()
   description?: string;
 
   @ApiProperty()
-  eventDate: Date;
+  eventDate!: Date;
 
   @ApiProperty()
-  location: string;
+  location!: string;
 
   @ApiPropertyOptional()
   capacity?: number;
 
   @ApiProperty({ type: CreatorSummaryDto })
-  creator: CreatorSummaryDto;
+  creator!: CreatorSummaryDto;
 
   @ApiProperty()
-  attendeeCount: number;
+  attendeeCount!: number;
 
   @ApiPropertyOptional({ description: 'Indicates if current requesting user is attending' })
   isAttending?: boolean;
 
   @ApiProperty()
-  createdAt: Date;
+  createdAt!: Date;
 
   @ApiProperty()
-  updatedAt: Date;
+  updatedAt!: Date;
 }
 
 export class PaginatedEventsResponseDto {
   @ApiProperty({ type: [EventResponseDto] })
-  data: EventResponseDto[];
+  data!: EventResponseDto[];
 
   @ApiProperty({
     example: {
@@ -58,7 +58,7 @@ export class PaginatedEventsResponseDto {
       totalPages: 3,
     },
   })
-  meta: {
+  meta!: {
     page: number;
     limit: number;
     total: number;

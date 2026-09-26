@@ -10,50 +10,61 @@ export class AttendeesService {
   constructor(private readonly prisma: PrismaService) {}
 
   async joinEvent(eventId: string, userId: string) {
-    const event = await this.prisma.event.findUnique({
-      where: { id: eventId },
-      include: {
-        _count: { select: { attendees: true } },
-      },
-    });
+    return await this.prisma.$transaction(async (tx) => {
+      // Lock the Event row FOR UPDATE to prevent race conditions during high-concurrency requests
+      const lockedEvents: any[] = await tx.$queryRaw`
+        SELECT id FROM "Event" WHERE id = ${eventId} FOR UPDATE
+      `;
 
-    if (!event) {
-      throw new NotFoundException('Event not found.');
-    }
+      if (!lockedEvents || lockedEvents.length === 0) {
+        throw new NotFoundException('Event not found.');
+      }
 
-    if (event.capacity && event._count.attendees >= event.capacity) {
-      throw new ConflictException('Event has reached maximum capacity.');
-    }
-
-    const existingAttendee = await this.prisma.eventAttendee.findUnique({
-      where: {
-        eventId_userId: { eventId, userId },
-      },
-    });
-
-    if (existingAttendee) {
-      throw new ConflictException('You are already registered for this event.');
-    }
-
-    try {
-      const attendee = await this.prisma.eventAttendee.create({
-        data: {
-          eventId,
-          userId,
+      const event = await tx.event.findUnique({
+        where: { id: eventId },
+        include: {
+          _count: { select: { attendees: true } },
         },
       });
 
-      return {
-        message: 'Successfully registered for event.',
-        attendeeId: attendee.id,
-        eventId: attendee.eventId,
-      };
-    } catch (error: any) {
-      if (error?.code === 'P2002') {
+      if (!event) {
+        throw new NotFoundException('Event not found.');
+      }
+
+      if (event.capacity && event._count.attendees >= event.capacity) {
+        throw new ConflictException('Event has reached maximum capacity.');
+      }
+
+      const existingAttendee = await tx.eventAttendee.findUnique({
+        where: {
+          eventId_userId: { eventId, userId },
+        },
+      });
+
+      if (existingAttendee) {
         throw new ConflictException('You are already registered for this event.');
       }
-      throw error;
-    }
+
+      try {
+        const attendee = await tx.eventAttendee.create({
+          data: {
+            eventId,
+            userId,
+          },
+        });
+
+        return {
+          message: 'Successfully registered for event.',
+          attendeeId: attendee.id,
+          eventId: attendee.eventId,
+        };
+      } catch (error: any) {
+        if (error?.code === 'P2002') {
+          throw new ConflictException('You are already registered for this event.');
+        }
+        throw error;
+      }
+    });
   }
 
   async leaveEvent(eventId: string, userId: string) {

@@ -37,6 +37,7 @@ describe('AuthService', () => {
 
     configService = {
       get: jest.fn((key: string, defaultValue: string) => defaultValue),
+      getOrThrow: jest.fn((key: string) => key),
     };
 
     const module: TestingModule = await Test.createTestingModule({

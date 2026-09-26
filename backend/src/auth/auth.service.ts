@@ -87,10 +87,7 @@ export class AuthService {
   }
 
   async refreshTokens(dto: RefreshTokenDto): Promise<AuthResponseDto> {
-    const refreshSecret = this.configService.get<string>(
-      'JWT_REFRESH_SECRET',
-      'refresh-token-super-secret-key-32bytes-min',
-    );
+    const refreshSecret = this.configService.getOrThrow<string>('JWT_REFRESH_SECRET');
 
     let payload: any;
     try {
@@ -135,17 +132,11 @@ export class AuthService {
   }
 
   private async generateTokens(userId: string, email: string, role: string) {
-    const accessSecret = this.configService.get<string>(
-      'JWT_ACCESS_SECRET',
-      'access-token-super-secret-key-32bytes-min',
-    );
-    const accessExpiresIn = this.configService.get<string>('JWT_ACCESS_EXPIRES_IN', '15m');
+    const accessSecret = this.configService.getOrThrow<string>('JWT_ACCESS_SECRET');
+    const accessExpiresIn = this.configService.getOrThrow<string>('JWT_ACCESS_EXPIRES_IN');
 
-    const refreshSecret = this.configService.get<string>(
-      'JWT_REFRESH_SECRET',
-      'refresh-token-super-secret-key-32bytes-min',
-    );
-    const refreshExpiresIn = this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '7d');
+    const refreshSecret = this.configService.getOrThrow<string>('JWT_REFRESH_SECRET');
+    const refreshExpiresIn = this.configService.getOrThrow<string>('JWT_REFRESH_EXPIRES_IN');
 
     const payload = { sub: userId, email, role };
 

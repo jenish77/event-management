@@ -23,6 +23,8 @@ describe('AttendeesService', () => {
 
   beforeEach(async () => {
     prisma = {
+      $transaction: jest.fn(async (cb) => cb(prisma)),
+      $queryRaw: jest.fn().mockResolvedValue([{ id: 'event-uuid-1' }]),
       event: {
         findUnique: jest.fn(),
       },

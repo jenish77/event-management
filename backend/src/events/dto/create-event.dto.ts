@@ -14,7 +14,7 @@ export class CreateEventDto {
   @IsNotEmpty({ message: 'Event title is required.' })
   @IsString({ message: 'Event title must be a string.' })
   @MaxLength(150, { message: 'Event title cannot exceed 150 characters.' })
-  title: string;
+  title!: string;
 
   @ApiPropertyOptional({ example: 'Deep dive into backend architecture', description: 'Detailed event description' })
   @IsOptional()
@@ -25,13 +25,13 @@ export class CreateEventDto {
   @ApiProperty({ example: '2026-10-15T18:30:00.000Z', description: 'Event date and time (ISO format)' })
   @IsNotEmpty({ message: 'Event date is required.' })
   @IsDateString({}, { message: 'Please provide a valid ISO date timestamp for eventDate.' })
-  eventDate: string;
+  eventDate!: string;
 
   @ApiProperty({ example: 'Surat, Gujarat', description: 'Event venue or location link' })
   @IsNotEmpty({ message: 'Event location is required.' })
   @IsString({ message: 'Event location must be a string.' })
   @MaxLength(250, { message: 'Event location cannot exceed 250 characters.' })
-  location: string;
+  location!: string;
 
   @ApiPropertyOptional({ example: 100, description: 'Maximum allowed attendees' })
   @IsOptional()

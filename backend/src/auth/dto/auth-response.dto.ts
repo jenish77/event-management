@@ -2,25 +2,25 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class UserPayloadDto {
   @ApiProperty()
-  id: string;
+  id!: string;
 
   @ApiProperty()
-  name: string;
+  name!: string;
 
   @ApiProperty()
-  email: string;
+  email!: string;
 
   @ApiProperty()
-  role: string;
+  role!: string;
 }
 
 export class AuthResponseDto {
   @ApiProperty({ description: 'Short-lived JWT access token (15m)' })
-  accessToken: string;
+  accessToken!: string;
 
   @ApiProperty({ description: 'Long-lived JWT refresh token (7d)' })
-  refreshToken: string;
+  refreshToken!: string;
 
   @ApiProperty({ type: UserPayloadDto })
-  user: UserPayloadDto;
+  user!: UserPayloadDto;
 }
